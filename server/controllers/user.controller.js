@@ -1,67 +1,30 @@
-require("dotenv").config();
-const jwt = require("jsonwebtoken");
+const express = require('express')
+const router = express.Router()
 
 const User = require("../models/userModal");
+const authMiddleware = require('../middlewares/auth.middleware');
 
-const newToken = (user) => {
-    return jwt.sign({ user }, ` ${process.env.JWT_SECRET_KEY}`);
-};
+router.get('', authMiddleware, async (req, res) => {
 
-const registerUser = async (req, res) => {
+    console.log('IN user controller', req.query.search)
 
     try {
-        const { name, email, password, pic } = req.body;
+        const keyword = req.query.search
+            ? {
+                $or: [
+                    { name: { $regex: req.query.search, $options: "i" } },
+                    { email: { $regex: req.query.search, $options: "i" } },
+                ],
+            }
+            : {};
 
-        if (!name || !email || !password) {
-            return res.status(400).send({ message: "Please Enter all the Fields" });
-        }
-
-        let user = await User.findOne({ email });
-
-        if (user) return res.status(400).send({ message: "Please try another email" });
-
-        user = await User.create({
-            name,
-            email,
-            password,
-            pic,
-        });
-
-        var token = newToken(user);
-
-        return res.send({ user, token })
-
+        const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
+        res.send(users);
     } catch (error) {
-        res.status(500).send(error.message)
+        return res.status(500).send(error.message);
     }
+})
 
-};
+module.exports = router
 
-const loginUser = async (req, res) => {
-    try {
-        const { email, password } = req.body;
 
-        const user = await User.findOne({ email });
-
-        if (!user)
-            return res
-                .status(400)
-                .send({ message: "Please try another email or password" });
-
-        const match = user.checkPassword(req.body.password);
-
-        if (!match)
-            return res
-                .status(400)
-                .send({ message: "Please try another email or password" });
-
-        const token = newToken(user);
-
-        return res.send({ user, token });
-
-    } catch (error) {
-        return res.status(500).send(err.message);
-    }
-};
-
-module.exports = { registerUser, loginUser };
