@@ -12,12 +12,14 @@ const connect = require('./server/configs/db');
 const { registerUser, loginUser } = require('./server/controllers/auth.controller');
 const userController = require('./server/controllers/user.controller')
 const chatRoutes = require("./server/routes/chatRoutes");
+const messageRoutes = require("./server/routes/messageRoutes");
 
 app.post("/user/signUp", registerUser);
 app.post("/user/loginIn", loginUser);
 
 app.use('/api/user', userController);
 app.use("/api/chat", chatRoutes);
+app.use("/api/message", messageRoutes);
 
 const PORT = process.env.PORT || 4003;
 
