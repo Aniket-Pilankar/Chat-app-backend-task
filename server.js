@@ -40,7 +40,10 @@ const io = require("socket.io")(server, {
   // pingTimeout: 60000,
   cors: {
     // origin: "http://localhost:3001", // Port Frontend
-    origin: "https://chat-app-frontend-task.vercel.app/", // Port Frontend
+    origin: [
+      "https://chat-app-frontend-task.vercel.app",
+      // "http://localhost:3000",
+    ], // Port Frontend
   },
 });
 
