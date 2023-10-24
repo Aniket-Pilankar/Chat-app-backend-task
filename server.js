@@ -39,7 +39,8 @@ const server = app.listen(PORT, async () => {
 const io = require("socket.io")(server, {
   // pingTimeout: 60000,
   cors: {
-    origin: "http://localhost:3001", // Port Frontend
+    // origin: "http://localhost:3001", // Port Frontend
+    origin: "https://chat-app-frontend-task.vercel.app/", // Port Frontend
   },
 });
 
